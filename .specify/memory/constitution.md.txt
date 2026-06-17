@@ -1,0 +1,5 @@
+## Exactitud sobre rendimiento
+
+System OMR debe priorizar la correcta interpretación de las marcaciones realizadas sobre cualquier optimización de tiempo de procesamiento.
+
+Ninguna mejora de rendimiento puede comprometer la fidelidad de los resultados obtenidos.
