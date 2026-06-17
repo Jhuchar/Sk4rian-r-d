@@ -9,15 +9,13 @@ Validación temprana de hojas inválidas.
 Principio candidato #3:
 Trazabilidad completa del procesamiento.
 
+Principio candidato #4:
+Respeto estricto de las reglas de la plantilla.
+
 Justificación:
-Tanto las páginas procesadas como las descartadas deben quedar registradas.
+Las respuestas deben evaluarse únicamente según las reglas definidas en la plantilla OMR.
 
-Objetivo:
-Permitir identificar posteriormente qué páginas de un PDF fueron procesadas y cuáles fueron descartadas.
-
-Información mínima a conservar:
-- Número de página.
-- Estado (procesada o descartada).
-- Motivo del descarte.
-- Asociación al job_id.
-- Evidencia suficiente para revisión visual posterior.
+Si una marcación no cumple las reglas configuradas:
+- No debe inferirse una respuesta.
+- No debe corregirse automáticamente.
+- Debe registrarse como marcación inválida o incorrecta.
