@@ -6,12 +6,18 @@ Exactitud sobre rendimiento.
 Principio candidato #2:
 Validación temprana de hojas inválidas.
 
-Justificación:
-Si una hoja no contiene los puntos de referencia requeridos para su alineación y lectura, el sistema debe descartarla inmediatamente.
+Principio candidato #3:
+Trazabilidad completa del procesamiento.
 
-Razones:
-- Evitar procesamiento innecesario.
-- Evitar falsos positivos.
-- Evitar intentos de lectura sobre hojas en blanco.
-- Evitar ciclos de validación sin valor.
-- Mantener la confiabilidad de los resultados.
+Justificación:
+Tanto las páginas procesadas como las descartadas deben quedar registradas.
+
+Objetivo:
+Permitir identificar posteriormente qué páginas de un PDF fueron procesadas y cuáles fueron descartadas.
+
+Información mínima a conservar:
+- Número de página.
+- Estado (procesada o descartada).
+- Motivo del descarte.
+- Asociación al job_id.
+- Evidencia suficiente para revisión visual posterior.
