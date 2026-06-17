@@ -1,6 +1,6 @@
 # Spec - Autoorientación y Normalización de Escaneos OMR
 
-## Resumen ejecutivo (≤150 palabras)
+## Resumen ejecutivo
 
 Se propone incorporar una funcionalidad de autoorientación y normalización de hojas ópticas antes del procesamiento OMR.
 
@@ -22,7 +22,7 @@ Durante el proceso de digitalización, los tutores pueden escanear hojas óptica
 
 Entre los problemas más frecuentes se encuentran:
 
-* Rotaciones de 90°, 180° o 270°.
+* Rotaciones de 90.
 * Hojas inclinadas.
 * Desalineaciones producidas por el escáner.
 * Mezcla de orientaciones dentro de un mismo PDF.
