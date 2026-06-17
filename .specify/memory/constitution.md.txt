@@ -1,5 +1,17 @@
-## Exactitud sobre rendimiento
+Proyecto: System OMR
 
-System OMR debe priorizar la correcta interpretación de las marcaciones realizadas sobre cualquier optimización de tiempo de procesamiento.
+Principio candidato #1:
+Exactitud sobre rendimiento.
 
-Ninguna mejora de rendimiento puede comprometer la fidelidad de los resultados obtenidos.
+Principio candidato #2:
+Validación temprana de hojas inválidas.
+
+Justificación:
+Si una hoja no contiene los puntos de referencia requeridos para su alineación y lectura, el sistema debe descartarla inmediatamente.
+
+Razones:
+- Evitar procesamiento innecesario.
+- Evitar falsos positivos.
+- Evitar intentos de lectura sobre hojas en blanco.
+- Evitar ciclos de validación sin valor.
+- Mantener la confiabilidad de los resultados.
