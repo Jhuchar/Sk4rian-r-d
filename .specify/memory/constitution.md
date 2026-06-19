@@ -2,7 +2,7 @@
 
 ## Propósito
 
-System OMR existe para procesar hojas ópticas de forma confiable, garantizando que los resultados obtenidos representen fielmente las marcaciones realizadas por los usuarios y permitiendo la trazabilidad completa del proceso.
+System OMR existe para procesar hojas ópticas previamente scaneadas en formato pdf de forma confiable, garantizando que los resultados obtenidos representen fielmente las marcaciones realizadas por los usuarios y permitiendo la trazabilidad completa del proceso.
 
 ---
 
@@ -85,11 +85,11 @@ El sistema debe reflejar las marcaciones detectadas y no interpretaciones poster
 
 Los principios definidos en esta constitución deberán aplicarse de manera uniforme a todas las plantillas soportadas por System OMR.
 
-Las plantillas podrán definir diferentes zonas de captura, estructuras y campos de lectura, pero no modificarán las reglas fundamentales de validación, trazabilidad, auditoría e integridad.
+Las plantillas podrán definir diferentes zonas de captura, opciones de respuestas y orden, pero no modificarán las reglas fundamentales de validación, trazabilidad, auditoría e integridad.
 
 ---
 
-## 9. Conservadurismo en la Validación
+## 9. Validación
 
 Ante cualquier duda sobre la validez de una hoja, el sistema deberá priorizar la confiabilidad de los resultados.
 
@@ -98,6 +98,14 @@ Es preferible descartar una hoja para revisión que generar resultados potencial
 La protección de la integridad de los resultados tiene prioridad sobre la maximización del número de páginas procesadas.
 
 ---
+
+## 10. Independencia de Procesamiento
+
+Cada página deberá evaluarse de manera independiente.
+
+Los errores, descartes o fallos detectados en una página no deberán afectar el procesamiento de las demás páginas pertenecientes al mismo documento.
+
+--
 
 # Cumplimiento
 

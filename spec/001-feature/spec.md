@@ -18,7 +18,7 @@ La funcionalidad se considera exitosa cuando todas las páginas con información
 
 ## Problema que resuelve
 
-Durante el proceso de digitalización, los tutores pueden escanear hojas ópticas con diferentes orientaciones o inclinaciones.
+Durante el proceso de escaneo, los tutores pueden escanear fichas ópticas con diferentes orientaciones o inclinaciones.
 
 Entre los problemas más frecuentes se encuentran:
 
@@ -52,19 +52,7 @@ Como asistente de sistemas, quiero que las hojas ópticas sean orientadas autom�
 
 ### AC-1.1
 
-Dado una hoja rotada 90°, cuando el sistema detecte sus puntos de referencia, entonces deberá corregir automáticamente la orientación y procesar la hoja.
-
-### AC-1.2
-
-Dado una hoja rotada 180°, cuando el sistema detecte sus puntos de referencia, entonces deberá corregir automáticamente la orientación y procesar la hoja.
-
-### AC-1.3
-
-Dado una hoja rotada 270°, cuando el sistema detecte sus puntos de referencia, entonces deberá corregir automáticamente la orientación y procesar la hoja.
-
-### AC-1.4
-
-Dado una hoja inclinada, cuando el sistema detecte los puntos de referencia necesarios, entonces deberá corregir la inclinación antes del procesamiento.
+Dado una hoja rotada debido a una inclinacion, cuando el sistema detecte sus puntos de referencia, entonces deberá corregir automáticamente la orientación, validar la barra de orientación y procesar la hoja.
 
 ---
 
@@ -156,3 +144,13 @@ La funcionalidad deberá respetar los principios definidos en la Constitución d
 * Se asume que la orientación puede corregirse utilizando la geometría obtenida a partir de los puntos de referencia.
 * Si los puntos de referencia no son detectables, la página será descartada.
 * Si una página es descartada, ello no afectará el procesamiento de las demás páginas del documento.
+
+## 7. Scope
+* **DENTRO:**
+    * Detección de puntos de referencia (anclas de esquina) y barra de alineación.
+    * Rotaciones ortogonales automáticas (90°, 180°, 270°).
+    * Procesamiento aislado por páginas dentro de un archivo PDF.
+    * Estructura de logs y códigos de error por página para auditoría.
+* **FUERA (explícito):**
+    * Corregir arrugas físicas severas o roturas en el papel mediante software (si la hoja está rota y falta un punto de referencia, se descarta).
+    * Inversión de color (si la hoja fue escaneada en negativo, queda fuera de este alcance).
