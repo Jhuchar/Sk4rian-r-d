@@ -1,50 +1,84 @@
 # Plan - Autoorientación y Normalización de Escaneos OMR
 
 ## Resumen ejecutivo
-Este plan establece el flujo de ingeniería para la detección geométrica y orientación horaria de páginas OMR de forma atómica. La decisión técnica principal es ejecutar el proceso en dos fases consecutivas e independientes: primero, la detección de un cuadrilátero mediante anclas y rotación sin recortes en memoria; segundo, la carga de la plantilla OMR sobre la matriz ya alineada. No habrá límite de descarte de páginas (si un PDF de 100 páginas solo tiene una válida, esa única se procesa). Las dudas abiertas se centran en el almacenamiento futuro de las capturas individuales, ya que actualmente solo se preserva el PDF original por parte de Learnex.
+
+Este plan establece el flujo de ingeniería para orientar páginas OMR de forma atómica y determinística, antes de la lectura de marcas. La decisión técnica principal es ejecutar el proceso en **dos fases consecutivas y desacopladas**: primero la corrección geométrica (detección de un cuadrilátero por anclas + giro ortogonal sin recortes en memoria); segundo, la carga de la plantilla OMR sobre la matriz ya alineada. La orientación se resuelve con **geometría, no con Machine Learning**, para que cada corrección sea auditable y explicable (Constitución Art. 6 y NFR-4). No hay límite de descarte: si un PDF de 100 páginas tiene una sola válida, esa única se procesa (fail-closed, Art. 9).
+
+Duda abierta crítica: **AC-1.4 pide corregir inclinación (skew sub-90°), pero el Scope y esta arquitectura solo cubren rotación ortogonal** — corregir skew exige deformar la imagen, lo que el ADR-1 prohíbe. Requiere decisión del PO antes de codear. También queda abierto el almacenamiento de las capturas por página (hoy Learnex solo preserva el PDF original).
+
+---
 
 ## 1. Enfoque técnico (alto nivel)
-El sistema aislará cada página del PDF en un búfer de imagen. Utilizando OpenCV, detectará las 4 anclas para formar un cuadrilátero y aplicará giros ortogonales (en el sentido de las agujas del reloj) hasta alinear la barra de orientación de forma recta (horizontal o vertical según la plantilla). Una vez estabilizada y derecha la imagen sin sufrir recortes ni distorsiones, se cargará la plantilla de lectura seleccionada para mapear los casilleros de marcas OMR de forma precisa.
+
+El sistema aísla cada página del PDF en un búfer de imagen. Con OpenCV detecta las 4 anclas de esquina para formar un cuadrilátero y aplica giros ortogonales (sentido horario) hasta dejar la barra de orientación recta (horizontal o vertical según la plantilla). Una vez la imagen está derecha y estabilizada, **sin recortes ni distorsiones**, se carga la plantilla de lectura para mapear los casilleros OMR con precisión. Cada página se evalúa de forma independiente: si falta evidencia geométrica (anclas o barra), se descarta con motivo tipificado y el bucle continúa con la siguiente.
+
+---
 
 ## 2. Componentes / archivos afectados
 
-* **DECISIÓN:** Crear un módulo de pre-procesamiento de imagen `OMRImageAligner` y modificar el pipeline de iteración de páginas `PDFPageIterator`.
-* **POR QUÉ:** Al separar la corrección geométrica de la carga de la plantilla de lectura, garantizamos que el motor OMR trabaje siempre sobre una imagen normalizada estándar, eliminando la duplicidad de lógica.
+- `src/services/omr/OMRImageAligner.ts` **(NUEVO)**: lógica OpenCV. Detecta el cuadrilátero de anclas (B1), calcula el sentido del giro horario y rota la imagen en memoria manteniendo las dimensiones intactas (sin recortar). Resuelve la orientación con la barra física (B2).
+- `src/pipelines/PDFPageIterator.ts` **(MODIFICADO)**: divide el PDF hoja por hoja y evalúa cada página de forma independiente. Si es válida invoca a `OMRImageAligner` y luego al motor de plantillas; si falla, acumula el motivo y continúa sin detener el lote.
+- `src/models/OMRBatchReport.ts` **(MODIFICADO)**: persiste contadores y listas explícitas: `total_paginas`, `paginas_procesadas`, `paginas_descartadas` con su `discarded_reason`, y la metadata de corrección (`rotation_label`) por página para auditoría.
+- **Lector OMR / motor de plantillas** (existente): NO se modifica; recibe siempre una imagen ya normalizada.
 
-### Componentes a crear o modificar:
-1. `src/services/omr/OMRImageAligner.ts` (NUEVO): Contiene la lógica OpenCV. Detecta el cuadrilátero de anclas, calcula el sentido del giro horario y rota la imagen en memoria manteniendo las dimensiones intactas (sin recortar).
-2. `src/pipelines/PDFPageIterator.ts` (MODIFICADO): Pipeline que divide el PDF hoja por hoja. Evaluará cada página de manera independiente. Si la página es válida, invoca a `OMRImageAligner` y luego al motor de plantillas; si falla, la salta de inmediato, acumula el error y continúa con la siguiente.
-3. `src/models/OMRBatchReport.ts` (MODIFICADO): Actualización del esquema de datos y reportes para persistir contadores y listas explícitas: `total_paginas`, `paginas_procesadas` (IDs/números de página exitosos) y `paginas_descartadas` junto con su `motivo_descarte`.
+---
 
 ## 3. Decisiones de arquitectura (mini-ADR)
 
-* **DECISIÓN SELECCIONADA:** Pipeline secuencial desacoplado: Fase 1 (Giro geométrico puro sin deformación) -> Fase 2 (Inyección de plantilla OMR de Learnex).
-* **ALTERNATIVA DESCARTADA:** Intentar recortar (*crop*) o reescalar la hoja al mismo tiempo que se detectan las anclas para encajarla a la fuerza en la plantilla.
-* **POR QUÉ SE DESCARTÓ:** Modificar el tamaño o recortar los bordes puede alterar las coordenadas relativas de las burbujas configuradas en la plantilla original de Learnex, generando lecturas erróneas. Es más seguro rotar la hoja limpiamente en sentido horario de manera recta y dejar que la plantilla mapee sobre los píxeles recolocados.
+### ADR-1 · Rotar limpio vs. recortar/reescalar para encajar
+
+- **DECISIÓN:** Pipeline secuencial desacoplado — Fase 1 (giro geométrico puro sin deformación) → Fase 2 (inyección de la plantilla OMR sobre los píxeles recolocados).
+- **POR QUÉ:** Modificar el tamaño o recortar bordes altera las coordenadas relativas de las burbujas configuradas en la plantilla original → lecturas erróneas (NFR-1). Es más seguro rotar la hoja limpiamente y dejar que la plantilla mapee.
+- **ALTERNATIVA DESCARTADA:** Recortar (*crop*) o reescalar la hoja al detectar las anclas para encajarla a la fuerza en la plantilla. Se descartó por el riesgo de corromper las coordenadas de las marcas.
+
+### ADR-2 · Geometría determinística vs. clasificador ML
+
+- **DECISIÓN:** Estimar la orientación con geometría sobre anclas + barra (giro ortogonal calculado), no con un modelo entrenado.
+- **POR QUÉ:** Cada corrección queda justificada por la posición de las marcas: reproducible, explicable y sin dataset (Art. 6 Auditabilidad, Art. 4 No inferir, NFR-4).
+- **ALTERNATIVA DESCARTADA:** Un clasificador de ML que prediga la rotación de la imagen. Se descartó por ser caja negra no auditable, introducir inferencia probabilística donde se exige evidencia, y requerir datos etiquetados inexistentes.
+
+### ADR-3 · Fail-closed ante ambigüedad
+
+- **DECISIÓN:** Sin evidencia suficiente (faltan anclas o barra) → descartar con motivo, nunca adivinar.
+- **POR QUÉ:** Prioriza la integridad del resultado sobre el volumen procesado (Art. 9, NFR-4). Un acierto incorrecto produce resultados corruptos indetectables; un descarte es trazable.
+- **ALTERNATIVA DESCARTADA:** Best-effort (aplicar la orientación más probable). Descartada por riesgo de lecturas silenciosamente erróneas.
+
+---
 
 ## 4. Riesgos y dependencias
-1. **Riesgo en la Detección de la Matriz (Tracer Bullet):** Que la biblioteca de OpenCV falle en calcular correctamente el cuadrilátero de las anclas debido a ruido en el escaneo, impidiendo determinar si la barra quedó en posición recta horizontal o vertical. *Mitigación:* Esta lógica se desarrollará y probará en aislamiento completo al inicio de la Fase 1.
-2. **Dependencia de almacenamiento de imágenes:** Como Learnex guarda el PDF completo pero **no** las capturas o capturas corregidas individualmente por página, la auditoría dependerá exclusivamente de los logs de texto en base de datos. Si un tutor reclama un falso descarte, no habrá imagen guardada de la hoja corregida para comprobarlo visualmente.
 
-## 5. Trazabilidad
-* **US-1 (Corrección Geométrica)** → Se implementa en la Fase 1 del desarrollo dentro de `OMRImageAligner.ts` mediante transformaciones de rotación horaria.
-* **US-2 y US-3 (Aislamiento y Reporte sin Límites)** → Se implementa en `PDFPageIterator.ts` y se refleja en `OMRBatchReport.ts`, asegurando la separación estricta entre páginas procesadas con éxito y páginas descartadas (sin importar si es 1 o son 100).
-* **US-4 (Clasificación de Descartes)** → Capturado en el flujo individual por página del pipeline, mapeando códigos de descarte legibles al reporte final del lote.
+1. **Detección de la matriz (Tracer Bullet):** OpenCV podría fallar al calcular el cuadrilátero por ruido del escaneo. *Mitigación:* la lógica se desarrolla y prueba en aislamiento al inicio de la Fase 1 (TC-003, TC-006).
+2. **Almacenamiento de imágenes:** Learnex guarda el PDF completo pero **no** las capturas corregidas por página; la auditoría depende solo de logs de texto. Si un tutor reclama un falso descarte, no hay imagen para verificarlo visualmente — tensión con Art. 6.
+3. **Inconsistencia AC-1.4 (inclinación):** el plan corrige rotación ortogonal, no skew fino; AC-1.4 pide corregir inclinación. *Acción:* el PO debe acotar AC-1.4 a rotación ortogonal (moviendo el deskew al FUERA) o abrirlo como feature aparte. Sin esto, AC-1.4 queda sin plan ni test.
+4. **Plantillas sin barra de orientación:** las 4 esquinas son simétricas; sin la barra, 0° vs. 180° es indistinguible. *Mitigación:* fail-closed (ADR-3) y exigir barra en la plantilla v3.
+5. **Dependencia de OpenCV** para la transformación geométrica.
 
-## 6. Cronograma de Tareas (Checklist de Implementación)
+---
 
-### Fase 1: El Tracer Bullet (Incertidumbre Primero)
-* [ ] **Tarea 1.1:** Instalar y configurar bindings de procesamiento de imágenes en el entorno del proyecto.
-* [ ] **Tarea 1.2:** Crear script aislado de prueba para detectar las 4 anclas de esquina y formar el cuadrilátero en memoria.
-* [ ] **Tarea 1.3:** Implementar el algoritmo de rotación horaria (0°, 90°, 180°, 270°) buscando dejar la barra de orientación de forma recta (horizontal/vertical) sin recortar la imagen.
-* [ ] **Tarea 1.4:** Validar matemáticamente que las coordenadas post-rotación de una hoja de muestra coincidan con la orientación esperada.
+## 5. Trazabilidad: cada US del spec → dónde se implementa
 
-### Fase 2: Aislamiento del Pipeline e Integración
-* [ ] **Tarea 2.1:** Modificar `PDFPageIterator.ts` para extraer páginas de manera totalmente independiente y envolver cada una en bloques de control de excepciones.
-* [ ] **Tarea 2.2:** Integrar el servicio de la Fase 1 en el flujo: si la página es orientada con éxito, proceder inmediatamente a cargar la plantilla seleccionada para la lectura de marcas.
-* [ ] **Tarea 2.3:** Asegurar que si una página falla, el bucle registre el descarte y pase a la siguiente sin detener el procesamiento del PDF (incluso en PDFs mixtos o con 99% de hojas inválidas).
+- **US-1 — AC-1.1/1.2/1.3** (rotación 90/180/270) → `OMRImageAligner.ts` Fase 1 (ADR-1, ADR-2). Pruebas: TC-007, TC-001, TC-008.
+- **US-1 — AC-1.4** (inclinación) → ⚠️ **sin implementación**; pendiente de decisión del PO (ver Riesgo 3).
+- **US-2 — AC-2.1/2.2** (aislamiento por página) → `PDFPageIterator.ts` (NFR-3). Pruebas: TC-005, TC-018.
+- **US-3 — AC-3.1/3.2** (auditoría de correcciones) → `OMRBatchReport.ts` + vista de detalle del lote. Pruebas: TC-011, TC-005.
+- **US-4 — AC-4.1/4.2** (descartes y su motivo) → `PDFPageIterator.ts` + `OMRBatchReport.ts` (ADR-3). Pruebas: TC-004, TC-010, TC-017.
 
-### Fase 3: Reportes y Auditoría de Datos
-* [ ] **Tarea 3.1:** Actualizar el modelo/tabla de reportes de lotes (`OMRBatchReport`) para incluir los campos estructurados de páginas procesadas y páginas descartadas.
-* [ ] **Tarea 3.2:** Conectar la salida del pipeline para que guarde el conteo exacto y los motivos tipificados en el reporte final del lote.
-* [ ] **Tarea 3.3:** Ejecutar pruebas de extremo a extremo con PDFs reales simulando errores de escaneo para validar la consistencia del reporte.
+---
+
+## 6. Cronograma de tareas (checklist de implementación)
+
+### Fase 1 · El Tracer Bullet (la incertidumbre primero)
+- [ ] **1.1** Instalar y configurar los bindings de procesamiento de imágenes (OpenCV) en el entorno.
+- [ ] **1.2** Script aislado para detectar las 4 anclas de esquina y formar el cuadrilátero en memoria (B1).
+- [ ] **1.3** Algoritmo de rotación horaria (0/90/180/270) dejando la barra recta, sin recortar (B2).
+- [ ] **1.4** Validar que las coordenadas post-rotación de una hoja de muestra coincidan con lo esperado (post-warp < 5 px).
+
+### Fase 2 · Aislamiento del pipeline e integración
+- [ ] **2.1** Modificar `PDFPageIterator.ts` para extraer páginas de forma independiente con control de excepciones por página.
+- [ ] **2.2** Integrar `OMRImageAligner`: si la página se orienta con éxito, cargar la plantilla y leer.
+- [ ] **2.3** Si una página falla, registrar el descarte y continuar (PDFs mixtos o con 99% inválidas).
+
+### Fase 3 · Reportes y auditoría
+- [ ] **3.1** Actualizar `OMRBatchReport` con páginas procesadas y descartadas (motivo tipificado, `rotation_label`).
+- [ ] **3.2** Conectar la salida del pipeline al reporte final del lote.
+- [ ] **3.3** Pruebas end-to-end con PDFs reales simulando errores de escaneo.
