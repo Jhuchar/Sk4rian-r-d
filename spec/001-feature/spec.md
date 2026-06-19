@@ -154,8 +154,14 @@ Las plantillas version 3 y superiores deberán pasar por el mismo pipeline de or
 * PDF donde todas las páginas requieran corrección automática.
 
 ---
+# 5. [NEEDS_CLARIFICATION]
 
-# 5. Assumptions
+1. **¿Cuál es el ángulo de inclinación?** debe permitir detectarlo en todos los grados .
+2. **¿Se almacenará la imagen corregida físicamente?** No es necesario solo se va a consdierar al generar un revision. 
+3. **¿Si cada hoja esta en blanco?** Pasa por el proceso pero se descarta al no tener los puntos de referencia.
+4. **Manejo de PDFs corruptos a nivel de archivo:** Si el PDF completo no se puede abrir o está corrupto desde la raíz se ignora y no ingresa al proceso.
+
+# 6. Assumptions
 
 * Se asume que las hojas válidas contienen puntos de referencia detectables.
 * Se asume que la barra de orientación permite determinar la posición correcta de la hoja.
@@ -163,7 +169,7 @@ Las plantillas version 3 y superiores deberán pasar por el mismo pipeline de or
 * Si los puntos de referencia no son detectables, la página será descartada.
 * Si una página es descartada, ello no afectará el procesamiento de las demás páginas del documento.
 
-## 6. Scope
+## 7. Scope
 * **DENTRO:**
     * Detección de puntos de referencia (anclas de esquina) y barra de alineación.
     * Rotaciones ortogonales automáticas (90°, 180°, 270°).
