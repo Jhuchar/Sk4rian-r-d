@@ -3,289 +3,384 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" href="data:," />
 <title>R1 · Sustentación Taller 2 — Autoorientación OMR</title>
 <style>
   :root {
-    --bg: #0b0f1a;
-    --bg2: #121829;
-    --card: #171f33;
-    --ink: #e8edf7;
-    --mut: #93a0bd;
-    --line: #2a3450;
+    --bg: #080b14;
+    --bg2: #0f1524;
+    --card: #141c30;
+    --card2: #18223a;
+    --ink: #eef2fb;
+    --mut: #94a2c0;
+    --line: #28324e;
     --product: #4ea1ff;
     --tech: #b07bff;
     --qa: #36d399;
     --todos: #ffcb47;
     --danger: #ff6b6b;
+    --paper: #f5f7fc;
+    --paper-line: #c4cee0;
+    --anchor: #1b2330;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
-    background: radial-gradient(1200px 800px at 80% -10%, #1b2742 0%, transparent 60%), var(--bg);
-    background-color: var(--bg);
+    background:
+      radial-gradient(1100px 700px at 88% -8%, rgba(176,123,255,.18), transparent 55%),
+      radial-gradient(900px 600px at -5% 100%, rgba(78,161,255,.14), transparent 55%),
+      var(--bg);
     color: var(--ink);
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
     overflow: hidden;
   }
   .stage { position: relative; height: 100vh; width: 100vw; }
   .slide {
-    position: absolute; inset: 0;
-    display: none;
-    flex-direction: column;
-    padding: 4.5vh 7vw 8vh;
-    animation: fade .45s ease;
+    position: absolute; inset: 0; display: none;
+    flex-direction: column; padding: 4.2vh 6vw 8vh;
   }
-  .slide.active { display: flex; }
-  @keyframes fade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .slide.active { display: flex; animation: fade .5s cubic-bezier(.2,.7,.2,1); }
+  @keyframes fade { from { opacity: 0; transform: translateY(16px) scale(.99); } to { opacity: 1; transform: none; } }
+  .slide.active .stagger > * { animation: rise .55s both; }
+  .slide.active .stagger > *:nth-child(2) { animation-delay: .08s; }
+  .slide.active .stagger > *:nth-child(3) { animation-delay: .16s; }
+  .slide.active .stagger > *:nth-child(4) { animation-delay: .24s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 
-  .topbar { display: flex; align-items: center; gap: 14px; margin-bottom: 2.4vh; flex-wrap: wrap; }
-  .badge {
-    font-size: 13px; font-weight: 700; letter-spacing: .4px;
-    padding: 6px 12px; border-radius: 999px; text-transform: uppercase;
-  }
-  .b-product { background: rgba(78,161,255,.16); color: var(--product); border: 1px solid rgba(78,161,255,.4); }
-  .b-tech { background: rgba(176,123,255,.16); color: var(--tech); border: 1px solid rgba(176,123,255,.4); }
-  .b-qa { background: rgba(54,211,153,.16); color: var(--qa); border: 1px solid rgba(54,211,153,.4); }
-  .b-todos { background: rgba(255,203,71,.16); color: var(--todos); border: 1px solid rgba(255,203,71,.4); }
-  .b-time { margin-left: auto; background: var(--card); color: var(--mut); border: 1px solid var(--line); }
-  .moment { color: var(--mut); font-size: 14px; font-weight: 600; letter-spacing: 1px; }
+  .topbar { display: flex; align-items: center; gap: 13px; margin-bottom: 2.2vh; flex-wrap: wrap; }
+  .badge { font-size: 12.5px; font-weight: 800; letter-spacing: .5px; padding: 6px 13px; border-radius: 999px; text-transform: uppercase; }
+  .b-product { background: rgba(78,161,255,.15); color: var(--product); border: 1px solid rgba(78,161,255,.45); }
+  .b-tech { background: rgba(176,123,255,.15); color: var(--tech); border: 1px solid rgba(176,123,255,.45); }
+  .b-qa { background: rgba(54,211,153,.15); color: var(--qa); border: 1px solid rgba(54,211,153,.45); }
+  .b-todos { background: rgba(255,203,71,.15); color: var(--todos); border: 1px solid rgba(255,203,71,.45); }
+  .b-time { margin-left: auto; background: var(--card); color: var(--mut); border: 1px solid var(--line); font-weight: 700; }
+  .moment { color: var(--mut); font-size: 13.5px; font-weight: 700; letter-spacing: 1.2px; }
 
-  h1 { font-size: clamp(34px, 5.2vw, 68px); line-height: 1.05; letter-spacing: -1px; margin-bottom: 2vh; }
-  h2 { font-size: clamp(26px, 3.6vw, 46px); line-height: 1.1; letter-spacing: -.5px; margin-bottom: 2.4vh; }
-  .lead { font-size: clamp(18px, 2vw, 26px); color: var(--ink); max-width: 60ch; line-height: 1.5; }
+  h1 { font-size: clamp(36px, 5.4vw, 70px); line-height: 1.03; letter-spacing: -1.5px; }
+  h2 { font-size: clamp(27px, 3.7vw, 46px); line-height: 1.08; letter-spacing: -.6px; margin-bottom: 2.2vh; }
+  .lead { font-size: clamp(17px, 1.9vw, 25px); line-height: 1.5; }
   .mut { color: var(--mut); }
-  .accent-tech { color: var(--tech); }
-  .accent-qa { color: var(--qa); }
-  .accent-todos { color: var(--todos); }
-  .accent-danger { color: var(--danger); }
+  .c-tech { color: var(--tech); } .c-qa { color: var(--qa); } .c-todos { color: var(--todos); } .c-danger { color: var(--danger); } .c-product { color: var(--product); }
 
-  .grid { display: grid; gap: 20px; margin-top: 1vh; }
-  .g2 { grid-template-columns: 1fr 1fr; }
-  .card {
-    background: var(--card); border: 1px solid var(--line);
-    border-radius: 16px; padding: 22px 24px;
-  }
-  .card h3 { font-size: 16px; text-transform: uppercase; letter-spacing: .6px; color: var(--mut); margin-bottom: 12px; }
-  .card.in { border-color: rgba(54,211,153,.4); }
-  .card.out { border-color: rgba(255,107,107,.4); }
-  ul { list-style: none; display: flex; flex-direction: column; gap: 11px; }
-  li { font-size: clamp(16px, 1.7vw, 21px); line-height: 1.4; padding-left: 26px; position: relative; }
-  li::before { content: "›"; position: absolute; left: 4px; color: var(--mut); font-weight: 700; }
+  .row { display: flex; gap: 30px; align-items: center; flex: 1; min-height: 0; }
+  .col { flex: 1; min-width: 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+  .card { background: linear-gradient(180deg, var(--card2), var(--card)); border: 1px solid var(--line); border-radius: 18px; padding: 22px 24px; box-shadow: 0 18px 40px -24px rgba(0,0,0,.8); }
+  .card h3 { font-size: 14px; text-transform: uppercase; letter-spacing: .7px; color: var(--mut); margin-bottom: 13px; }
+  .card.in { border-color: rgba(54,211,153,.45); }
+  .card.out { border-color: rgba(255,107,107,.45); }
+  .card.star { border-color: rgba(255,203,71,.5); box-shadow: 0 0 0 1px rgba(255,203,71,.15), 0 18px 50px -22px rgba(255,203,71,.25); }
+
+  ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  li { font-size: clamp(15px, 1.55vw, 20px); line-height: 1.4; padding-left: 25px; position: relative; }
+  li::before { content: "›"; position: absolute; left: 3px; color: var(--mut); font-weight: 800; }
   li.ok::before { content: "✓"; color: var(--qa); }
   li.no::before { content: "✗"; color: var(--danger); }
-  li.warn::before { content: "▲"; color: var(--todos); font-size: 14px; }
+  li.warn::before { content: "▲"; color: var(--todos); font-size: 13px; top: 3px; }
+  .pill { font-family: ui-monospace, "Cascadia Code", monospace; font-size: 14px; background: #0a1120; border: 1px solid var(--line); padding: 2px 8px; border-radius: 6px; color: #cfe0ff; }
 
-  .pill { display: inline-block; font-family: ui-monospace, "Cascadia Code", monospace; font-size: 15px;
-    background: #0c1322; border: 1px solid var(--line); padding: 3px 9px; border-radius: 7px; color: #cfe0ff; }
+  /* ---------- OMR SHEET SVG ---------- */
+  .sheet-wrap { display: flex; align-items: center; justify-content: center; }
+  .sheet { width: clamp(150px, 16vw, 230px); filter: drop-shadow(0 24px 40px rgba(0,0,0,.55)); }
+  .paper { fill: var(--paper); stroke: var(--paper-line); stroke-width: 2; }
+  .anchor { fill: var(--anchor); transition: .3s; }
+  .bar { fill: var(--tech); }
+  .hl .anchor { fill: var(--qa); }
+  .hl .anchor { animation: anchorPulse 1.4s ease-in-out infinite; }
+  @keyframes anchorPulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+  .hl-bar .bar { fill: var(--todos); animation: anchorPulse 1.4s ease-in-out infinite; }
+  .bub { fill: none; stroke: var(--paper-line); stroke-width: 2.2; }
+  .bub.f { fill: #2b3344; stroke: #2b3344; }
+  .ln { fill: #d4dcea; }
 
-  .adr { border-left: 4px solid var(--tech); padding-left: 20px; margin-top: 1vh; }
-  .adr .k { color: var(--tech); font-weight: 800; letter-spacing: .5px; font-size: 14px; text-transform: uppercase; }
-  .adr p { font-size: clamp(16px, 1.8vw, 22px); margin: 4px 0 14px; line-height: 1.4; }
+  .wobble { animation: wob 3.2s ease-in-out infinite; transform-origin: center; }
+  @keyframes wob { 0%,100% { transform: rotate(-23deg); } 50% { transform: rotate(-17deg); } }
+  .float { animation: flo 5s ease-in-out infinite; }
+  @keyframes flo { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
-  table { border-collapse: collapse; width: 100%; font-size: clamp(13px, 1.4vw, 18px); }
-  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); }
-  th { color: var(--mut); text-transform: uppercase; font-size: 12px; letter-spacing: .6px; }
-  tr.hole td { background: rgba(255,107,107,.10); }
-  .tag { font-weight: 800; }
-  .tag.ok { color: var(--qa); }
-  .tag.hole { color: var(--danger); }
-  .tag.warn { color: var(--todos); }
-  .tag.part { color: var(--todos); }
+  .stamp { font-weight: 900; letter-spacing: 1px; border: 4px solid var(--danger); color: var(--danger); padding: 6px 16px; border-radius: 10px; transform: rotate(-12deg); font-size: clamp(16px,1.7vw,22px); text-transform: uppercase; background: rgba(255,107,107,.08); }
+  .stamp.ok { border-color: var(--qa); color: var(--qa); background: rgba(54,211,153,.08); }
 
-  .big-quote { font-size: clamp(22px, 3vw, 40px); line-height: 1.25; max-width: 24ch; font-weight: 700; }
-  .roles-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 3vh; }
-  .role-chip { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px; min-width: 210px; }
-  .role-chip .r { font-weight: 800; font-size: 18px; }
-  .role-chip .n { color: var(--mut); font-size: 15px; margin-top: 4px; }
+  /* pipeline */
+  .flow { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; width: 100%; }
+  .stage-box { flex: 1; background: linear-gradient(180deg, var(--card2), var(--card)); border: 1px solid var(--line); border-radius: 14px; padding: 14px 12px; text-align: center; }
+  .stage-box.f1 { border-color: rgba(176,123,255,.5); }
+  .stage-box.f2 { border-color: rgba(78,161,255,.5); }
+  .stage-box .t { font-weight: 800; font-size: clamp(13px,1.3vw,17px); }
+  .stage-box .s { color: var(--mut); font-size: 12.5px; margin-top: 3px; }
+  .stage-box .tag { font-size: 11px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; }
+  .arr { color: var(--mut); font-size: 26px; flex: 0 0 auto; }
+  .arr.flow-on { animation: arrPulse 1.5s ease-in-out infinite; }
+  @keyframes arrPulse { 0%,100% { opacity: .35; transform: translateX(0); } 50% { opacity: 1; transform: translateX(3px); } }
 
-  .star { font-size: 22px; }
-  .beforeafter { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; margin-top: 1vh; }
-  .arrow { font-size: 40px; color: var(--todos); }
+  .adr { border-left: 4px solid var(--tech); padding-left: 18px; }
+  .adr .k { color: var(--tech); font-weight: 800; letter-spacing: .5px; font-size: 12.5px; text-transform: uppercase; }
+  .adr p { font-size: clamp(15px,1.55vw,20px); margin: 3px 0 12px; line-height: 1.35; }
 
-  /* controls */
-  .hud { position: fixed; bottom: 18px; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 18px; z-index: 50; }
-  .progress { position: fixed; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, var(--product), var(--tech), var(--qa)); transition: width .3s ease; z-index: 60; }
-  .nav-btn { background: var(--card); border: 1px solid var(--line); color: var(--ink); width: 42px; height: 42px; border-radius: 50%; font-size: 20px; cursor: pointer; transition: .2s; }
+  table { border-collapse: collapse; width: 100%; font-size: clamp(13px,1.35vw,18px); }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+  th { color: var(--mut); text-transform: uppercase; font-size: 11.5px; letter-spacing: .6px; }
+  tr.hole td { background: rgba(255,107,107,.12); }
+  .tg { font-weight: 800; }
+
+  .big-quote { font-size: clamp(24px,3.3vw,44px); line-height: 1.18; font-weight: 800; max-width: 22ch; letter-spacing: -.5px; }
+
+  /* skew visual */
+  .skew-stage { position: relative; width: clamp(200px,22vw,300px); height: clamp(220px,28vh,300px); display:flex; align-items:center; justify-content:center; }
+  .ghost { position: absolute; inset: 0; border: 2px dashed var(--qa); border-radius: 8px; opacity: .5; }
+  .angle-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--danger); color: #fff; font-weight: 900; padding: 4px 12px; border-radius: 999px; font-size: 15px; }
+
+  /* roles */
+  .roles-row { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 3vh; }
+  .role-chip { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 20px; min-width: 200px; }
+  .role-chip .r { font-weight: 800; font-size: 17px; }
+  .role-chip .n { color: var(--mut); font-size: 14px; margin-top: 3px; }
+
+  /* HUD */
+  .progress { position: fixed; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, var(--product), var(--tech), var(--qa)); transition: width .35s ease; z-index: 60; }
+  .hud { position: fixed; bottom: 16px; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 16px; z-index: 50; }
+  .nav-btn { background: var(--card); border: 1px solid var(--line); color: var(--ink); width: 40px; height: 40px; border-radius: 50%; font-size: 19px; cursor: pointer; transition: .2s; }
   .nav-btn:hover { background: var(--bg2); border-color: var(--mut); }
-  .counter { color: var(--mut); font-size: 14px; font-variant-numeric: tabular-nums; min-width: 54px; text-align: center; }
-  .timer { position: fixed; top: 16px; right: 20px; font-variant-numeric: tabular-nums; font-size: 15px; color: var(--mut); background: var(--card); border: 1px solid var(--line); padding: 6px 12px; border-radius: 10px; z-index: 60; cursor: pointer; }
-  .timer.run { color: var(--qa); border-color: rgba(54,211,153,.4); }
+  .counter { color: var(--mut); font-size: 13.5px; font-variant-numeric: tabular-nums; min-width: 52px; text-align: center; }
+  .timer { position: fixed; top: 14px; right: 18px; font-variant-numeric: tabular-nums; font-size: 15px; color: var(--mut); background: var(--card); border: 1px solid var(--line); padding: 6px 12px; border-radius: 10px; z-index: 60; cursor: pointer; }
+  .timer.run { color: var(--qa); border-color: rgba(54,211,153,.45); }
   .timer.over { color: var(--danger); border-color: rgba(255,107,107,.5); }
-  .hint { position: fixed; bottom: 20px; right: 20px; color: var(--mut); font-size: 12px; z-index: 50; }
+  .hint { position: fixed; bottom: 18px; right: 18px; color: var(--mut); font-size: 11.5px; z-index: 50; }
   .kbd { background: var(--card); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; font-size: 11px; }
 </style>
 </head>
 <body>
 <div class="progress" id="progress"></div>
-<div class="timer" id="timer" title="Click o tecla T para iniciar/pausar · R para reiniciar">⏱ 00:00</div>
+<div class="timer" id="timer" title="Click o T para iniciar/pausar · R reinicia">⏱ 00:00</div>
+
+<!-- ===== Reusable OMR sheet ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="omr" viewBox="0 0 200 264">
+    <rect class="paper" x="6" y="6" width="188" height="252" rx="7"/>
+    <!-- orientation bar (asimétrica, define el "arriba") -->
+    <rect class="bar" x="66" y="18" width="68" height="11" rx="3"/>
+    <!-- 4 anclas de esquina -->
+    <rect class="anchor" x="16" y="16" width="20" height="20" rx="2"/>
+    <rect class="anchor" x="164" y="16" width="20" height="20" rx="2"/>
+    <rect class="anchor" x="16" y="228" width="20" height="20" rx="2"/>
+    <rect class="anchor" x="164" y="228" width="20" height="20" rx="2"/>
+    <!-- header -->
+    <rect class="ln" x="44" y="46" width="112" height="7" rx="3"/>
+    <!-- filas de burbujas -->
+    <g>
+      <circle class="bub f" cx="52" cy="84" r="6.5"/><circle class="bub" cx="74" cy="84" r="6.5"/><circle class="bub" cx="96" cy="84" r="6.5"/><circle class="bub" cx="118" cy="84" r="6.5"/><circle class="bub" cx="140" cy="84" r="6.5"/>
+      <circle class="bub" cx="52" cy="106" r="6.5"/><circle class="bub" cx="74" cy="106" r="6.5"/><circle class="bub f" cx="96" cy="106" r="6.5"/><circle class="bub" cx="118" cy="106" r="6.5"/><circle class="bub" cx="140" cy="106" r="6.5"/>
+      <circle class="bub" cx="52" cy="128" r="6.5"/><circle class="bub" cx="74" cy="128" r="6.5"/><circle class="bub" cx="96" cy="128" r="6.5"/><circle class="bub" cx="118" cy="128" r="6.5"/><circle class="bub f" cx="140" cy="128" r="6.5"/>
+      <circle class="bub" cx="52" cy="150" r="6.5"/><circle class="bub f" cx="74" cy="150" r="6.5"/><circle class="bub" cx="96" cy="150" r="6.5"/><circle class="bub" cx="118" cy="150" r="6.5"/><circle class="bub" cx="140" cy="150" r="6.5"/>
+      <circle class="bub f" cx="52" cy="172" r="6.5"/><circle class="bub" cx="74" cy="172" r="6.5"/><circle class="bub" cx="96" cy="172" r="6.5"/><circle class="bub" cx="118" cy="172" r="6.5"/><circle class="bub" cx="140" cy="172" r="6.5"/>
+      <circle class="bub" cx="52" cy="194" r="6.5"/><circle class="bub" cx="74" cy="194" r="6.5"/><circle class="bub" cx="96" cy="194" r="6.5"/><circle class="bub f" cx="118" cy="194" r="6.5"/><circle class="bub" cx="140" cy="194" r="6.5"/>
+    </g>
+  </symbol>
+</svg>
+
 <div class="stage" id="stage">
 
   <!-- 0 · PORTADA -->
   <section class="slide active">
-    <div class="topbar"><span class="moment">SDD · TALLER 2 — SPEC + PLAN + PRUEBAS</span></div>
-    <h1>Autoorientación y<br/>normalización de<br/>escaneos <span class="accent-tech">OMR</span></h1>
-    <p class="lead mut">La intención se defiende en voz alta <em>antes</em> de escribir código.</p>
-    <div class="roles-row">
-      <div class="role-chip"><div class="r" style="color:var(--product)">Product · PO</div><div class="n">Jhuliño Ventura</div></div>
-      <div class="role-chip"><div class="r" style="color:var(--tech)">Tech Lead</div><div class="n">Martin Centeno</div></div>
-      <div class="role-chip"><div class="r" style="color:var(--qa)">QA Tester</div><div class="n">Chen Lin</div></div>
+    <div class="row">
+      <div class="col stagger">
+        <span class="moment">SDD · TALLER 2 — SPEC + PLAN + PRUEBAS</span>
+        <h1 style="margin:1.4vh 0 2vh">Autoorientación<br/>de escaneos <span class="c-tech">OMR</span></h1>
+        <p class="lead mut" style="max-width:30ch">La intención se defiende en voz alta <em>antes</em> de escribir una línea de código.</p>
+        <div class="roles-row">
+          <div class="role-chip"><div class="r c-product">Product · PO</div><div class="n">Jhuliño Ventura</div></div>
+          <div class="role-chip"><div class="r c-tech">Tech Lead</div><div class="n">Martin Centeno</div></div>
+          <div class="role-chip"><div class="r c-qa">QA Tester</div><div class="n">Chen Lin</div></div>
+        </div>
+        <p class="mut" style="margin-top:2.4vh">Equipo <b>R1</b> · Three Amigos</p>
+      </div>
+      <div class="col sheet-wrap">
+        <svg class="sheet float hl" style="width:clamp(180px,20vw,300px)" viewBox="0 0 200 264"><use href="#omr"/></svg>
+      </div>
     </div>
-    <p class="mut" style="margin-top:3vh">Equipo <b>R1</b> · Three Amigos</p>
   </section>
 
   <!-- 1 · MOMENTO 0 · GANCHO -->
   <section class="slide">
     <div class="topbar"><span class="badge b-product">Product</span><span class="moment">MOMENTO 0 · EL GANCHO</span><span class="badge b-time">0:30</span></div>
-    <h2 class="big-quote">Una hoja escaneada al revés hoy se descarta a mano… y el alumno se queda sin nota.</h2>
-    <p class="lead mut" style="margin-top:3vh">Tutores escanean fichas OMR rotadas o inclinadas. Cada error obliga a reprocesar manualmente o a re-escanear. A escala, eso es tiempo operativo perdido y resultados que no salen.</p>
+    <div class="row">
+      <div class="col stagger">
+        <h2 class="big-quote">Una hoja escaneada al revés hoy se descarta <span class="c-danger">a mano</span>.</h2>
+        <p class="lead mut" style="margin-top:2.5vh; max-width:34ch">Y si nadie la revisa, el alumno se queda sin nota. Cada rotación o inclinación = reproceso manual o re-escaneo. A escala, es tiempo perdido y resultados que no salen.</p>
+      </div>
+      <div class="col sheet-wrap" style="position:relative">
+        <svg class="sheet wobble" viewBox="0 0 200 264"><use href="#omr"/></svg>
+        <div class="stamp" style="position:absolute; top:18%; left:50%; transform:translate(-50%,0) rotate(-12deg)">✕ Descartada</div>
+      </div>
+    </div>
   </section>
 
-  <!-- 2 · MOMENTO 1 · POR QUÉ + SCOPE -->
+  <!-- 2 · MOMENTO 1 · SCOPE -->
   <section class="slide">
     <div class="topbar"><span class="badge b-product">Product</span><span class="moment">MOMENTO 1 · POR QUÉ ESTA HISTORIA</span><span class="badge b-time">1:00</span></div>
-    <h2>Pequeña pero real — y con un <span class="accent-danger">FUERA</span> explícito</h2>
-    <div class="grid g2">
-      <div class="card in">
-        <h3>Dentro del scope</h3>
+    <h2>Pequeña pero real — con un <span class="c-danger">FUERA</span> explícito</h2>
+    <div class="row stagger" style="gap:20px">
+      <div class="card in col">
+        <h3>✓ Dentro del scope</h3>
         <ul>
           <li class="ok">Detección de 4 anclas + barra de orientación</li>
           <li class="ok">Rotaciones ortogonales 90° / 180° / 270°</li>
           <li class="ok">Procesamiento aislado por página</li>
-          <li class="ok">Logs y motivos de descarte por página</li>
+          <li class="ok">Motivo de descarte por página (auditoría)</li>
         </ul>
       </div>
-      <div class="card out">
-        <h3>Fuera (a propósito)</h3>
+      <div class="card out col">
+        <h3>✗ Fuera (a propósito)</h3>
         <ul>
           <li class="no">Reparar arrugas o roturas físicas del papel</li>
           <li class="no">Inversión de color (escaneo en negativo)</li>
-          <li class="no">Deskew fino sub-90° → ver Momento 5</li>
+          <li class="no">Deskew fino sub-90° → lo verán en el Momento 5</li>
         </ul>
       </div>
     </div>
-    <p class="mut" style="margin-top:2.4vh">Disciplina de scope: si toca <b>integridad de datos</b>, la spec es obligatoria (§16.3).</p>
+    <p class="mut" style="margin-top:2.2vh">Toca <b>integridad de datos</b> → la spec es obligatoria sin importar el tamaño (§16.3).</p>
   </section>
 
   <!-- 3 · MOMENTO 2 · INTENCIÓN -->
   <section class="slide">
     <div class="topbar"><span class="badge b-product">Product</span><span class="moment">MOMENTO 2 · LA INTENCIÓN</span><span class="badge b-time">1:00</span></div>
     <h2>Qué y por qué</h2>
-    <div class="card" style="margin-bottom:18px">
-      <h3>User Story 1 · P1</h3>
-      <p class="lead">Como <b>asistente de sistemas</b>, quiero que las hojas se orienten automáticamente antes de procesarlas, para reducir los errores del escaneo.</p>
-    </div>
-    <div class="grid g2">
-      <div class="card">
-        <h3>Criterio clave · AC-1.2</h3>
-        <p class="lead"><span class="mut">Dado</span> una hoja rotada 180°, <span class="mut">cuando</span> se detecten sus puntos de referencia, <span class="mut">entonces</span> el sistema corrige la orientación y procesa la hoja.</p>
-      </div>
-      <div class="card">
-        <h3>Lo que asumimos</h3>
-        <ul>
-          <li>Las hojas válidas tienen anclas detectables</li>
-          <li>La <b>barra de orientación</b> resuelve 0° vs 180°</li>
-          <li class="warn">Si falta evidencia → se descarta, no se adivina</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4 · MOMENTO 3 · DISEÑO + ADR (TECH / MARTIN) -->
-  <section class="slide">
-    <div class="topbar"><span class="badge b-tech">Tech Lead</span><span class="moment">MOMENTO 3 · EL DISEÑO Y *LA* DECISIÓN</span><span class="badge b-time">1:30</span></div>
-    <h2>Pipeline en <span class="accent-tech">2 fases desacopladas</span></h2>
-    <div class="grid g2">
-      <div class="card">
-        <h3>Enfoque en 3 frases</h3>
-        <ul>
-          <li><b>Fase 1:</b> detectar 4 anclas → cuadrilátero → girar en memoria <b>sin recortar</b></li>
-          <li><b>Fase 2:</b> sobre la imagen ya derecha, cargar la plantilla OMR y leer</li>
-          <li>El motor OMR <b>no se toca</b>: siempre recibe una imagen normalizada</li>
-        </ul>
-        <p class="mut" style="margin-top:14px">Toca: <span class="pill">OMRImageAligner.ts</span> <span class="pill">PDFPageIterator.ts</span> <span class="pill">OMRBatchReport.ts</span></p>
-      </div>
-      <div class="card">
-        <h3 class="accent-tech">⭐ ADR estrella</h3>
-        <div class="adr">
-          <div class="k">Decisión</div>
-          <p>Rotar limpio en sentido horario, sin deformar.</p>
-          <div class="k">Alternativa descartada</div>
-          <p>Recortar / reescalar para encajar a la fuerza en la plantilla.</p>
-          <div class="k">Por qué</div>
-          <p>Recortar mueve las <b>coordenadas de las burbujas</b> → lecturas erróneas (NFR-1). Además: geometría, no ML — para que cada corrección sea <b>auditable</b> (Art. 6).</p>
+    <div class="row" style="gap:34px">
+      <div class="col stagger">
+        <div class="card" style="margin-bottom:16px">
+          <h3 class="c-product">User Story 1 · P1</h3>
+          <p class="lead">Como <b>asistente de sistemas</b>, quiero que las hojas se orienten <b>automáticamente</b> antes de procesarlas, para reducir errores del escaneo.</p>
+        </div>
+        <div class="card">
+          <h3>Lo que asumimos</h3>
+          <ul>
+            <li>Las hojas válidas tienen anclas detectables</li>
+            <li class="warn">Si falta evidencia → se descarta, <b>no se adivina</b></li>
+          </ul>
         </div>
       </div>
+      <div class="col" style="flex:0 0 auto; text-align:center">
+        <div style="font-size:13px;letter-spacing:1px" class="mut">AC-1.2 · ROTADA 180°</div>
+        <div style="display:flex; align-items:center; gap:14px; margin-top:10px">
+          <svg class="sheet" style="width:130px; transform:rotate(180deg)" viewBox="0 0 200 264"><use href="#omr"/></svg>
+          <span class="arr flow-on">→</span>
+          <svg class="sheet hl-bar" style="width:130px" viewBox="0 0 200 264"><use href="#omr"/></svg>
+        </div>
+        <div class="mut" style="margin-top:10px; font-size:14px">la <b class="c-todos">barra</b> resuelve 0° vs 180°</div>
+      </div>
     </div>
   </section>
 
-  <!-- 5 · MOMENTO 4 · QA + COVERAGE MATRIX -->
+  <!-- 4 · MOMENTO 3 · TECH / ADR -->
+  <section class="slide">
+    <div class="topbar"><span class="badge b-tech">Tech Lead</span><span class="moment">MOMENTO 3 · EL DISEÑO Y *LA* DECISIÓN</span><span class="badge b-time">1:30</span></div>
+    <h2>Pipeline en <span class="c-tech">2 fases desacopladas</span></h2>
+    <div class="flow stagger" style="margin-bottom:2.2vh">
+      <div class="stage-box"><div class="t">PDF</div><div class="s">lote de hojas</div></div>
+      <span class="arr flow-on">→</span>
+      <div class="stage-box"><div class="t">Split página</div><div class="s">aislada en memoria</div></div>
+      <span class="arr flow-on">→</span>
+      <div class="stage-box f1"><div class="tag c-tech">Fase 1</div><div class="t">Anclas + giro</div><div class="s">sin recortar</div></div>
+      <span class="arr flow-on">→</span>
+      <div class="stage-box f2"><div class="tag c-product">Fase 2</div><div class="t">Plantilla OMR</div><div class="s">lee marcas</div></div>
+      <span class="arr flow-on">→</span>
+      <div class="stage-box"><div class="t c-qa">Resultado</div><div class="s">+ auditoría</div></div>
+    </div>
+    <div class="row" style="gap:20px">
+      <div class="card star col">
+        <h3 class="c-todos">⭐ ADR estrella</h3>
+        <div class="adr">
+          <div class="k">Decisión</div><p>Rotar limpio en sentido horario, <b>sin deformar</b>.</p>
+          <div class="k">Alternativa descartada</div><p>Recortar / reescalar para encajar a la fuerza en la plantilla.</p>
+          <div class="k">Por qué</div><p>Recortar mueve las <b>coordenadas de las burbujas</b> → lecturas erróneas (NFR-1). Y geometría, <b>no ML</b>: cada corrección es <b>auditable</b> (Art. 6).</p>
+        </div>
+      </div>
+      <div class="col sheet-wrap" style="flex:0 0 auto">
+        <svg class="sheet hl" style="width:clamp(150px,15vw,210px)" viewBox="0 0 200 264"><use href="#omr"/></svg>
+        <div class="mut" style="text-align:center; margin-top:8px; font-size:13px">Fase 1 ilumina las <b class="c-qa">4 anclas</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · MOMENTO 4 · QA -->
   <section class="slide">
     <div class="topbar"><span class="badge b-qa">QA</span><span class="moment">MOMENTO 4 · ¿CÓMO SABREMOS QUE FUNCIONA?</span><span class="badge b-time">1:30</span></div>
-    <h2>23 casos con datos reales — y los huecos a la vista</h2>
-    <div class="grid g2" style="align-items:start">
-      <div class="card">
-        <h3 class="accent-qa">Caso concreto · TC-002 (falla cerrado)</h3>
+    <h2>23 casos con datos reales — y los <span class="c-danger">huecos</span> a la vista</h2>
+    <div class="row" style="gap:22px; align-items:stretch">
+      <div class="card col" style="flex:0 0 38%">
+        <h3 class="c-qa">Caso concreto · TC-002 — falla cerrado</h3>
+        <div style="display:flex; align-items:center; gap:16px; margin:6px 0 14px">
+          <svg class="sheet" style="width:96px" viewBox="0 0 200 264"><use href="#omr"/></svg>
+          <div class="stamp" style="font-size:14px">✕ descartada</div>
+        </div>
         <ul>
-          <li><b>Datos:</b> barra masa <span class="pill">0.13</span>, borde opuesto <span class="pill">0.08</span></li>
+          <li>Barra masa <span class="pill">0.13</span> · borde opuesto <span class="pill">0.08</span></li>
           <li>Contraste = 0.13 / 0.08 = <span class="pill">1.625</span></li>
-          <li class="warn">Como 1.625 &lt; 2.0 → la página se <b>descarta</b></li>
-          <li class="ok"><span class="pill">discarded_reason: "missing_orientation_bar"</span></li>
+          <li class="warn">1.625 &lt; 2.0 → se <b>descarta</b></li>
+          <li class="ok"><span class="pill">discarded_reason: missing_orientation_bar</span></li>
         </ul>
-        <p class="mut" style="margin-top:12px">Resultado observable exacto, no "que funcione bien".</p>
       </div>
-      <div class="card">
-        <h3>Coverage matrix (extracto)</h3>
+      <div class="card col">
+        <h3>Coverage matrix — los huecos no se maquillan</h3>
         <table>
           <tr><th>Requisito</th><th>Plan</th><th>Test</th><th></th></tr>
-          <tr><td>AC-1.1 / 1.2 / 1.3</td><td>Fase 1</td><td>TC-007/001/008</td><td class="tag ok">✅</td></tr>
-          <tr class="hole"><td>AC-1.4 inclinación</td><td>—</td><td>—</td><td class="tag hole">🔴</td></tr>
-          <tr><td>AC-2.x aislamiento</td><td>Iterator</td><td>TC-005/018</td><td class="tag ok">✅</td></tr>
-          <tr><td>AC-4.x descartes</td><td>Report</td><td>TC-004/010</td><td class="tag ok">✅</td></tr>
-          <tr><td>NFR-6/7/8</td><td>—</td><td>TC-021/22/23</td><td class="tag warn">⚠️</td></tr>
+          <tr><td>AC-1.1 / 1.2 / 1.3 (90/180/270)</td><td>Fase 1</td><td>TC-007/001/008</td><td class="tg c-qa">✅</td></tr>
+          <tr class="hole"><td><b>AC-1.4 inclinación</b></td><td>—</td><td>—</td><td class="tg c-danger">🔴</td></tr>
+          <tr><td>AC-2.x aislamiento por página</td><td>Iterator</td><td>TC-005/018</td><td class="tg c-qa">✅</td></tr>
+          <tr><td>AC-4.x descartes + motivo</td><td>Report</td><td>TC-004/010</td><td class="tg c-qa">✅</td></tr>
+          <tr><td>NFR-6/7/8 (test sin requisito)</td><td>—</td><td>TC-021/22/23</td><td class="tg c-todos">⚠️</td></tr>
         </table>
-        <p class="mut" style="margin-top:10px">La matriz <b>marca los huecos</b>, no los maquilla.</p>
       </div>
     </div>
   </section>
 
-  <!-- 6 · MOMENTO 5 · LA ROTURA (TODOS) -->
+  <!-- 6 · MOMENTO 5 · LA ROTURA -->
   <section class="slide">
     <div class="topbar"><span class="badge b-todos">Todos</span><span class="moment">MOMENTO 5 · ⭐ LA ROTURA QUE ATRAPAMOS</span><span class="badge b-time">1:30</span></div>
-    <h2 class="accent-todos">El criterio que se contradice con la arquitectura</h2>
-    <div class="beforeafter">
-      <div class="card out">
-        <h3>Lo que pedía la spec</h3>
-        <p class="lead"><b>AC-1.4:</b> "Dado una hoja <b>inclinada</b>, corregir <b>la inclinación</b>."</p>
-        <p class="mut" style="margin-top:12px">Inclinación = skew de pocos grados.</p>
+    <h2 class="c-todos">El criterio que choca con la arquitectura</h2>
+    <div class="row" style="gap:26px">
+      <div class="col" style="flex:0 0 auto; display:flex; align-items:center; gap:18px">
+        <div style="text-align:center">
+          <div class="skew-stage">
+            <div class="ghost"></div>
+            <div class="angle-badge">7°</div>
+            <svg class="sheet" style="width:clamp(150px,15vw,200px); transform:rotate(7deg)" viewBox="0 0 200 264"><use href="#omr"/></svg>
+          </div>
+          <div class="mut" style="font-size:13px; margin-top:6px">hoja <b>inclinada</b> (AC-1.4)</div>
+        </div>
+        <span class="arr">→ 90° →</span>
+        <div style="text-align:center; position:relative">
+          <svg class="sheet" style="width:clamp(150px,15vw,200px); transform:rotate(7deg)" viewBox="0 0 200 264"><use href="#omr"/></svg>
+          <div class="stamp" style="position:absolute; bottom:8%; left:50%; transform:translate(-50%,0) rotate(-8deg); font-size:13px">sigue inclinada</div>
+          <div class="mut" style="font-size:13px; margin-top:6px">rotación ortogonal <b>no</b> la endereza</div>
+        </div>
       </div>
-      <div class="arrow">⚡</div>
-      <div class="card in">
-        <h3>Lo que el plan permite</h3>
-        <p class="lead">Solo <b>rotación ortogonal</b> (90°) y <b>sin deformar</b> (ADR-1).</p>
-        <p class="mut" style="margin-top:12px">Un giro de 90° <b>no</b> endereza un 7°. Y deskew = deformar = mover burbujas.</p>
+      <div class="col stagger">
+        <div class="card out"><p class="lead"><b>AC-1.4</b> pide corregir la inclinación. Pero un giro de 90° no quita un skew de 7° — y un deskew real <b>deforma</b>, lo que el ADR-1 prohíbe.</p></div>
+        <p class="lead" style="margin-top:2vh"><b class="c-todos">Sin plan, sin test, y choca con el ADR.</b> Lo atrapó el cruce spec ↔ plan ↔ test <b>en papel</b>. En código nos costaba días; acá lo decidimos en 10 minutos.</p>
       </div>
     </div>
-    <p class="lead" style="margin-top:3vh"><b>Sin plan, sin test, y choca con el ADR.</b> Lo atrapó el cruce spec ↔ plan ↔ test <span class="accent-todos">en papel</span>. En código nos habría costado días; acá lo decidimos en 10 minutos: acotar AC-1.4 a rotación ortogonal o abrir el deskew como feature aparte.</p>
   </section>
 
   <!-- 7 · MOMENTO 6 · DIFICULTADES + IA -->
   <section class="slide">
     <div class="topbar"><span class="badge b-todos">Todos</span><span class="moment">MOMENTO 6 · DIFICULTADES Y DÓNDE CORREGIMOS A LA IA</span><span class="badge b-time">1:00</span></div>
     <h2>Honestidad &gt; marketing</h2>
-    <div class="grid g2">
-      <div class="card">
+    <div class="row stagger" style="gap:20px">
+      <div class="card col">
         <h3>Lo más difícil</h3>
         <ul>
-          <li>Acotar el scope: dijimos NO al deskew fino</li>
-          <li>Alinear numeración de AC entre spec y tests (hubo drift)</li>
+          <li>Acotar el scope: dijimos <b>NO</b> al deskew fino</li>
+          <li>Alinear la numeración de AC entre spec y tests (hubo drift)</li>
           <li>Las tres miradas: PO, Tech y QA no siempre coinciden</li>
         </ul>
       </div>
-      <div class="card">
-        <h3 class="accent-danger">Dónde le dijimos NO a la IA</h3>
+      <div class="card out col">
+        <h3 class="c-danger">Dónde le dijimos NO a la IA</h3>
         <ul>
-          <li class="no">Propuso un clasificador ML para la rotación → lo rechazamos: caja negra, viola la Auditabilidad (Art. 6)</li>
-          <li class="no">Generó tests para NFR que la spec no declaraba (scope creep) → los marcamos</li>
+          <li class="no">Propuso un <b>clasificador ML</b> para la rotación → rechazado: caja negra, viola la Auditabilidad (Art. 6)</li>
+          <li class="no">Generó tests de NFR que la spec no declaraba (scope creep) → los marcamos</li>
         </ul>
       </div>
     </div>
@@ -294,36 +389,40 @@
   <!-- 8 · MOMENTO 7 · CIERRE -->
   <section class="slide">
     <div class="topbar"><span class="badge b-product">Product</span><span class="moment">MOMENTO 7 · CIERRE</span><span class="badge b-time">0:30</span></div>
-    <h2 class="big-quote">Si tuviéramos que codear esto mañana, estamos listos…</h2>
-    <p class="lead" style="margin-top:2vh">…porque cada decisión tiene su porqué, cada criterio su prueba, y los huecos ya están nombrados.</p>
-    <div class="card" style="margin-top:3vh; max-width:680px">
-      <h3>git log — del borrador a la versión validada</h3>
-      <ul style="font-family:ui-monospace,monospace; font-size:15px; gap:7px">
-        <li>spec grilling revision</li>
-        <li>spec grilling 1</li>
-        <li>Grilling constitution</li>
-        <li>Grilling sesión 4 · 3 · 2 · 1</li>
-        <li class="mut">estructura de trabajo · initial commit</li>
-      </ul>
+    <div class="row">
+      <div class="col stagger">
+        <h2 class="big-quote">Si codeáramos esto mañana, <span class="c-qa">estamos listos</span>…</h2>
+        <p class="lead" style="margin-top:2vh; max-width:32ch">…porque cada decisión tiene su porqué, cada criterio su prueba, y los huecos ya están nombrados.</p>
+        <p class="mut" style="margin-top:2.4vh">Lo que haríamos distinto: cerrar la numeración de AC <b>antes</b> de que QA escriba los casos.</p>
+      </div>
+      <div class="card col" style="flex:0 0 auto; max-width:420px">
+        <h3>git log — del borrador a la versión validada</h3>
+        <ul style="font-family:ui-monospace,monospace; font-size:14px; gap:7px">
+          <li class="ok">presentación HTML de sustentación</li>
+          <li class="ok">coverage matrix y gate de claridad</li>
+          <li class="ok">ADR geometría-vs-ML y hueco AC-1.4</li>
+          <li>preguntas de claridad · revisión plan</li>
+          <li class="mut">spec grilling · constitution · v0</li>
+        </ul>
+      </div>
     </div>
-    <p class="mut" style="margin-top:2.4vh">Una cosa que haríamos distinto: cerrar la numeración de AC <b>antes</b> de que QA escribiera los casos.</p>
   </section>
 
-  <!-- 9 · APÉNDICE Q&A -->
+  <!-- 9 · APÉNDICE -->
   <section class="slide">
-    <div class="topbar"><span class="badge b-todos">Apéndice</span><span class="moment">PREPARACIÓN Q&A (no se proyecta en la exposición)</span></div>
+    <div class="topbar"><span class="badge b-todos">Apéndice</span><span class="moment">PREPARACIÓN DE RESPUESTAS · BLOQUE DE PREGUNTAS DEL JURADO</span></div>
     <h2>Respuestas listas</h2>
-    <div class="grid g2">
+    <div class="grid2 stagger">
       <div class="card">
         <ul>
-          <li><b class="accent-todos">¿Supuesto que rompe todo?</b><br/><span class="mut">Que la plantilla tiene barra de orientación. Sin ella, 180° es indistinguible → fail-closed.</span></li>
-          <li><b class="accent-todos">¿Qué quedó fuera?</b><br/><span class="mut">Deskew fino, inversión de color, reparar roturas físicas.</span></li>
+          <li><b class="c-todos">¿Supuesto que rompe todo?</b><br/><span class="mut">Que la plantilla tiene barra de orientación. Sin ella, 180° es indistinguible → fail-closed.</span></li>
+          <li><b class="c-todos">¿Qué quedó fuera?</b><br/><span class="mut">Deskew fino, inversión de color, reparar roturas físicas.</span></li>
         </ul>
       </div>
       <div class="card">
         <ul>
-          <li><b class="accent-todos">¿Cuándo sería correcta la alternativa ML?</b><br/><span class="mut">Si la auditabilidad no fuera no-negociable y tuviéramos dataset etiquetado.</span></li>
-          <li><b class="accent-todos">Si spec y plan chocan, ¿cuál manda?</b><br/><span class="mut">La spec (el porqué). El plan se ajusta — por eso AC-1.4 vuelve al PO.</span></li>
+          <li><b class="c-todos">¿Cuándo sería correcta la alternativa ML?</b><br/><span class="mut">Si la auditabilidad no fuera no-negociable y tuviéramos dataset etiquetado.</span></li>
+          <li><b class="c-todos">Si spec y plan chocan, ¿cuál manda?</b><br/><span class="mut">La spec (el porqué). El plan se ajusta — por eso AC-1.4 vuelve al PO.</span></li>
         </ul>
       </div>
     </div>
@@ -352,36 +451,27 @@
   document.getElementById('next').onclick = () => show(i + 1);
   document.getElementById('prev').onclick = () => show(i - 1);
   document.addEventListener('keydown', e => {
+    const k = e.key.toLowerCase();
     if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { show(i + 1); e.preventDefault(); }
     else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { show(i - 1); }
     else if (e.key === 'Home') { show(0); }
     else if (e.key === 'End') { show(slides.length - 1); }
-    else if (e.key.toLowerCase() === 't') { toggleTimer(); }
-    else if (e.key.toLowerCase() === 'r') { resetTimer(); }
-    else if (e.key.toLowerCase() === 'f') { toggleFs(); }
+    else if (k === 't') { toggleTimer(); }
+    else if (k === 'r') { resetTimer(); }
+    else if (k === 'f') { toggleFs(); }
   });
-
-  // Timer (objetivo 8:00)
   const tEl = document.getElementById('timer');
-  let secs = 0, running = false, iv = null;
-  const LIMIT = 8 * 60;
+  let secs = 0, running = false, iv = null; const LIMIT = 8 * 60;
   function render() {
-    const m = String(Math.floor(secs / 60)).padStart(2, '0');
-    const s = String(secs % 60).padStart(2, '0');
+    const m = String(Math.floor(secs/60)).padStart(2,'0'), s = String(secs%60).padStart(2,'0');
     tEl.textContent = (secs >= LIMIT ? '⛔ ' : '⏱ ') + m + ':' + s;
     tEl.classList.toggle('run', running && secs < LIMIT);
     tEl.classList.toggle('over', secs >= LIMIT);
   }
-  function toggleTimer() {
-    running = !running;
-    if (running) { iv = setInterval(() => { secs++; render(); }, 1000); }
-    else { clearInterval(iv); }
-    render();
-  }
-  function resetTimer() { running = false; clearInterval(iv); secs = 0; render(); }
-  function toggleFs() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+  function toggleTimer(){ running=!running; if(running){iv=setInterval(()=>{secs++;render();},1000);}else{clearInterval(iv);} render(); }
+  function resetTimer(){ running=false; clearInterval(iv); secs=0; render(); }
+  function toggleFs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
   tEl.onclick = toggleTimer;
-
   show(0); render();
 </script>
 </body>
