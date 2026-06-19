@@ -105,7 +105,104 @@ Cada página deberá evaluarse de manera independiente.
 
 Los errores, descartes o fallos detectados en una página no deberán afectar el procesamiento de las demás páginas pertenecientes al mismo documento.
 
---
+---
+
+# Stack Tecnológico Aprobado
+
+## Motor OMR
+
+- Python + OpenCV (FIXED, no cambia sin aprobación del Tech Lead)
+- Detección de puntos de referencia (anclas de esquina)
+- Cálculos de orientación y rotación
+- Análisis de imágenes: solo geometría clásica
+
+## Pipeline
+
+- Node.js + TypeScript
+- Iteración de páginas PDF
+- Integración con motor Python via subprocess
+
+## Contenedores
+
+- Docker para levantamiento de servicios
+- Logs con timestamp por página
+- Formato estructurado (JSON)
+
+## Prohibido
+
+- ML frameworks para rotación/detección (TensorFlow, PyTorch, etc.)
+- Nuevas dependencias sin aprobación del Tech Lead
+- Bases de datos adicionales
+- Almacenamiento permanente de imágenes individuales
+
+---
+
+# Estándares de Código
+
+## Patrones de Diseño (Obligatorios)
+
+### Strategy
+
+Para algoritmos de rotación.
+Permite cambiar OpenCV por otra librería sin modificar el pipeline.
+Ejemplo: DifferentRotationStrategy, RotationDetector.
+
+### Pipeline
+
+Para secuencia de procesamiento.
+Claridad y extensibilidad en flujo: detección → orientación → lectura → reporte.
+Ejemplo: OMRExecutionPipeline.
+
+### Factory
+
+Para crear procesadores según template.
+Facilita soporte para versiones futuras (v4, v5) sin modificar código existente.
+Ejemplo: TemplateProcessorFactory.
+
+## Solid Principles
+
+- SRP: Cada clase con una responsabilidad
+- OCP: Abierto a extensión, cerrado a modificación
+- LSP: Subtipos sustituibles
+- ISP: Interfaces específicas
+- DIP: Depender de abstracciones
+
+## Manejo de Errores
+
+- Códigos tipificados por tipo de fallo
+- Excepciones controladas por página
+- No detener procesamiento completo por error individual
+
+---
+
+# Restricciones de Rendimiento
+
+## Por Página
+
+- Detección puntos de referencia: < 500ms
+- Orientación/rotación: < 500ms
+- Total orientación: < 1s por hoja
+
+## Por Lote
+
+- Orientación no debe superar 20% del tiempo total
+- El 80% restante es procesamiento OMR y reporte
+
+## Medición
+
+- Logs con timestamp por página en Docker
+- Formato JSON: { "pagina": 1, "tiempo_orientacion_ms": 350, "rotacion": 90, "puntos_detectados": 4 }
+
+---
+
+# Restricciones de Seguridad
+
+- No exponer credenciales en código
+- No logs con datos sensibles de estudiantes
+- Validación de inputs en cada capa
+- Imágenes no se almacenan permanentemente (solo PDF original)
+
+---
 
 # Cumplimiento
 

@@ -22,7 +22,7 @@ Durante el proceso de escaneo, los tutores pueden escanear fichas ópticas con d
 
 Entre los problemas más frecuentes se encuentran:
 
-* Rotaciones de 90.
+* Rotaciones de 90°.
 * Hojas inclinadas.
 * Desalineaciones producidas por el escáner.
 * Mezcla de orientaciones dentro de un mismo PDF.
@@ -120,6 +120,24 @@ El sistema no deberá inferir orientaciones cuando no exista evidencia suficient
 
 La funcionalidad deberá respetar los principios definidos en la Constitución de System OMR.
 
+### NFR-6 (Medible)
+
+La detección de puntos de referencia y orientación no deberá superar 1 segundo por página.
+**Métrica:** Tiempo de procesamiento de orientación < 1000ms.
+**Cómo se mide:** Logs con timestamp por página en Docker.
+
+### NFR-7 (Medible)
+
+La funcionalidad no deberá crear más de 2 archivos nuevos en el proyecto.
+**Métrica:** Número de archivos nuevos en el PR.
+**Cómo se mide:** Revisión de archivos creados vs modificados.
+
+### NFR-8 (Medible)
+
+Las plantillas version 3 y superiores deberán pasar por el mismo pipeline de orientación.
+**Métrica:** Compatibilidad de templates v3+.
+**Cómo se mide:** Test de integración con templates v3, v4 futuro.
+
 ---
 
 # 4. Casos Borde
@@ -145,7 +163,7 @@ La funcionalidad deberá respetar los principios definidos en la Constitución d
 * Si los puntos de referencia no son detectables, la página será descartada.
 * Si una página es descartada, ello no afectará el procesamiento de las demás páginas del documento.
 
-## 7. Scope
+## 6. Scope
 * **DENTRO:**
     * Detección de puntos de referencia (anclas de esquina) y barra de alineación.
     * Rotaciones ortogonales automáticas (90°, 180°, 270°).

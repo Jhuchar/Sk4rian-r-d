@@ -2,7 +2,7 @@
 
 ## Resumen ejecutivo
 
-Como QA, valido el motor v3 desde sus resultados observables: los 4 ArUcos deben localizar y recortar la hoja, la barra fisica debe resolver la orientacion, y cualquier falta de evidencia debe terminar en descarte explicable. La suite cubre B1, B2, rotaciones 0/90/180/270, contraste critico, contrato `template_version: 3`, pass-through de `orientationBar`, paginas mixtas y compatibilidad de `discarded_reason`. Queda fuera validar cada pixel del algoritmo OpenCV; se valida que el comportamiento final cumpla la spec, el plan y la constitucion.
+Como QA, valido el motor v3 desde sus resultados observables: los 4 puntos de referencia deben localizar y orientar la hoja, la barra fisica debe resolver la orientacion, y cualquier falta de evidencia debe terminar en descarte explicable. La suite cubre B1, B2, rotaciones 0/90/180/270, contraste critico, contrato `template_version: 3`, pass-through de `orientationBar`, paginas mixtas y compatibilidad de `discarded_reason`. Queda fuera validar cada pixel del algoritmo OpenCV; se valida que el comportamiento final cumpla la spec, el plan y la constitucion.
 
 ---
 
@@ -12,11 +12,11 @@ La feature se viene resolviendo en OMR-system con commits reales. Estos son los 
 
 | Commit | Fecha | Evidencia QA |
 | --- | --- | --- |
-| `d4b7851` | 2026-06-08 | Planificacion SDD del rediseno de deteccion ArUco |
-| `6274adb` | 2026-06-08 | Red de seguridad para redisenar ArUco con fixtures 90/270/missing marker |
-| `1202abe` | 2026-06-08 | Rediseno de deteccion ArUco a una sola pasada |
+| `d4b7851` | 2026-06-08 | Planificacion SDD del rediseno de deteccion Puntos de Referencia |
+| `6274adb` | 2026-06-08 | Red de seguridad para redisenar Puntos de Referencia con fixtures 90/270/missing marker |
+| `1202abe` | 2026-06-08 | Rediseno de deteccion Puntos de Referencia a una sola pasada |
 | `d7d10b0` | 2026-06-09 | Contrato `template-v3-orientation-bar` y retiro del fast-path anterior |
-| `09d30ef` | 2026-06-09 | Motor v3: ArUco localizan/cortan, barra orienta |
+| `09d30ef` | 2026-06-09 | Motor v3: Puntos de Referencia localizan/cortan, barra orienta |
 | `b0649c3` | 2026-06-09 | Persistencia de `orientation_bar` en template v3 |
 | `ce48223` | 2026-06-09 | Editor v3 con barra de orientacion y persistencia |
 | `8436cd2` | 2026-06-10 | Orientacion por barra robusta para hojas invertidas 180 grados |
@@ -37,9 +37,9 @@ La feature se viene resolviendo en OMR-system con commits reales. Estos son los 
 | PDF-90 | Misma hoja v3 rotada 90 grados |
 | PDF-180 | Misma hoja v3 rotada 180 grados |
 | PDF-270 | Misma hoja v3 rotada 270 grados |
-| PDF-MISSING-REF | Hoja donde se detectan menos de 4 ArUcos |
-| PDF-MISSING-BAR | Hoja con 4 ArUcos detectables, pero sin barra donde el template la declara |
-| PDF-MIX-5 | p1 normal, p2 rotada 90, p3 sin ArUcos suficientes, p4 rotada 180, p5 sin barra |
+| PDF-MISSING-REF | Hoja donde se detectan menos de 4 Puntos de Referencias |
+| PDF-MISSING-BAR | Hoja con 4 Puntos de Referencias detectables, pero sin barra donde el template la declara |
+| PDF-MIX-5 | p1 normal, p2 rotada 90, p3 sin Puntos de Referencias suficientes, p4 rotada 180, p5 sin barra |
 
 ---
 
@@ -78,7 +78,7 @@ Esperado:
 
 ### TC-003 (AC-1.1): B1 elige esquinas y descarta mancha central
 
-Datos: imagen con 4 ArUcos en esquinas y una mancha cuadrada en el centro.
+Datos: imagen con 4 Puntos de Referencias en esquinas y una mancha cuadrada en el centro.
 
 Pasos:
 1. Ejecutar localizacion B1.
@@ -90,7 +90,7 @@ Esperado:
 - Descarta la mancha central.
 - Continua a B2 con 4 puntos validos.
 
-### TC-004 (AC-1.1, AC-4.1): Sin ArUcos suficientes
+### TC-004 (AC-1.1, AC-4.1): Sin Puntos de Referencias suficientes
 
 Datos: `TPL-V3-OK` + `PDF-MISSING-REF`.
 
@@ -160,20 +160,20 @@ Esperado:
 - La orientacion final permite leer las zonas correctamente.
 - `rotation_label` o metadata equivalente indica 270 grados.
 
-### TC-009 (AC-2.1, Art. 4): No usar ID ArUco como fuente de orientacion
+### TC-009 (AC-2.1, Art. 4): No usar ID Puntos de Referencia como fuente de orientacion
 
-Datos: hoja v3 con 4 ArUcos detectables y barra visible.
+Datos: hoja v3 con 4 Puntos de Referencias detectables y barra visible.
 
 Pasos:
 1. Procesar la hoja.
 2. Revisar logs o ruta de ejecucion.
 
 Esperado:
-- Los ArUcos se usan para localizar y recortar.
+- Los Puntos de Referencias se usan para localizar y recortar.
 - La barra se usa para orientar.
-- No se ejecuta el slow-path v2 de rotar y re-detectar ArUcos para inferir orientacion.
+- No se ejecuta el slow-path v2 de rotar y re-detectar Puntos de Referencias para inferir orientacion.
 
-### TC-010 (AC-4.1, AC-4.2): Barra ausente con ArUcos presentes
+### TC-010 (AC-4.1, AC-4.2): Barra ausente con Puntos de Referencias presentes
 
 Datos: `TPL-V3-OK` + `PDF-MISSING-BAR`.
 
@@ -182,7 +182,7 @@ Pasos:
 2. Consultar resultado de pagina 1.
 
 Esperado:
-- Los 4 ArUcos se detectan.
+- Los 4 Puntos de Referencias se detectan.
 - La pagina se descarta porque no hay barra confiable.
 - `discarded_reason` es `"missing_orientation_bar"`.
 - No se generan zonas de respuesta.
@@ -317,6 +317,46 @@ Esperado:
 - Ninguna pagina queda sin estado explicable.
 - La feature cumple separacion B1/B2 y fail-closed.
 
+### TC-021 (NFR-6): Rendimiento orientación < 1s
+
+Datos: PDF con 10 páginas mixtas (0°, 90°, 180°, 270°).
+
+Pasos:
+1. Procesar el PDF completo.
+2. Medir tiempo de orientación por página (detección + rotación).
+3. Registrar en logs con timestamp.
+
+Esperado:
+- Cada página: orientación < 1000ms.
+- Total orientación ≤ 20% del tiempo total de procesamiento.
+- Logs incluyen: { "pagina": N, "tiempo_orientacion_ms": X, "rotacion": Y, "puntos_detectados": Z }.
+
+### TC-022 (NFR-7): Simplicidad verificable
+
+Datos: Revisar archivos creados/modificados en el PR de la feature.
+
+Pasos:
+1. Contar archivos nuevos vs modificados.
+2. Verificar que no se crearon abstracciones prematuras.
+
+Esperado:
+- Máximo 2 archivos nuevos (OMRImageAligner.ts).
+- El resto son modificaciones de archivos existentes (PDFPageIterator.ts, OMRBatchReport.ts).
+
+### TC-023 (NFR-8): Consistencia entre templates
+
+Datos: Templates v3, v3 sin barra, v2.
+
+Pasos:
+1. Procesar con template v3 válido.
+2. Intentar procesar con template v3 sin barra.
+3. Intentar procesar con template v2.
+
+Esperado:
+- v3 válido: procesa correctamente.
+- v3 sin barra: rechaza antes de encolar, error indica "falta barra de orientación".
+- v2: rechaza antes de encolar, error indica "solo se soporta template_version: 3".
+
 ---
 
 ## 4. Matriz QA
@@ -332,6 +372,9 @@ Esperado:
 | NFR-1 Alineacion post-warp < 5px | TC-006, TC-019 | Cubierto |
 | NFR-2 Masa minima 0.12 | TC-001, TC-002 | Cubierto |
 | NFR-3 Aislamiento por pagina | TC-005, TC-018 | Cubierto |
+| NFR-6 Rendimiento < 1s | TC-021 | Cubierto |
+| NFR-7 Simplicidad | TC-022 | Cubierto |
+| NFR-8 Consistencia templates | TC-023 | Cubierto |
 | Contrato backend v3 | TC-012, TC-013, TC-014 | Cubierto |
 | Manifest Node -> Python | TC-015, TC-016 | Cubierto |
 | Constitution Art. 4 / Art. 7 | TC-009, TC-020 | Cubierto |
